@@ -1,0 +1,1 @@
+g++ cube.cpp glad.c -o cube -lGL -lglfw -ldl && ./cube
