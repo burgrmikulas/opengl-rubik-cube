@@ -32,6 +32,7 @@ float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
 const int CUBE_SIZE = 3;
+const float PARTS_SPAN = 1.1f;
 
 class Part {
 private:
@@ -41,6 +42,18 @@ public:
   Part (int x, int y, int z, int rx, int ry, int rz):
   x(x), y(y), z(z), rx(rx), ry(ry), rz(rz) {
     // Do nothing
+  }
+
+  float getX () {
+    return x;
+  }
+
+  float getY () {
+    return y;
+  }
+
+  float getZ () {
+    return z;
   }
 
   float getRx () {
@@ -90,7 +103,7 @@ int main()
 
   // glfw window creation
   // --------------------
-  GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Cube", NULL, NULL);
   if (window == NULL)
   {
     std::cout << "Failed to create GLFW window" << std::endl;
@@ -215,6 +228,18 @@ int main()
   // uncomment this call to draw in wireframe polygons.
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+  // TEMP: Rotating the right side
+  struct Rotation {
+    int x = -1;
+    int y = 0;
+    int z = -1;
+    float dirX = 0.0f;
+    float dirY = -1.0f;
+    float dirZ = 0.0f;
+    float angle = 0.0f;
+    const float speed = 1.0f;
+  } rotation;
+
   // render loop
   // -----------
   while (!glfwWindowShouldClose(window))
@@ -252,18 +277,38 @@ int main()
     ourShader.setMat4("projection", projection);
     ourShader.setVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
 
+    // TEMP: Rotating the right side
+    rotation.angle += rotation.speed;
+
     for (int i = 0; i < CUBE_SIZE; i++) {
       for (int j = 0; j < CUBE_SIZE; j++) {
         for (int k = 0; k < CUBE_SIZE; k++) {
+          // Init empty model and part pointer
           glm::mat4 model = glm::mat4(1.0f);
           Part *part = cube->getPart(i, j, k);
-          float xPos = i * 1.1f;
-          float yPos = j * 1.1f;
-          float zPos = k * 1.1f;
-          model = glm::translate(model, glm::vec3(xPos, yPos, zPos));
-          model = glm::rotate(model, glm::radians(part->getRx()), glm::vec3(1.0f, 0.0f, 0.0f));
-          model = glm::rotate(model, glm::radians(part->getRy()), glm::vec3(0.0f, 1.0f, 0.0f));
-          model = glm::rotate(model, glm::radians(part->getRz()), glm::vec3(0.0f, 0.0f, 1.0f));
+
+          // TEMP: Rotating the right side - translation to the side center
+          if (i == rotation.x || j == rotation.y || k == rotation.z) {
+            // model = glm::translate(model, glm::vec3(i * PARTS_SPAN, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(rotation.angle), glm::vec3(rotation.dirX, rotation.dirY, rotation.dirZ));
+            float x = (i - 1) * PARTS_SPAN;
+            float y = (j - 1) * PARTS_SPAN;
+            float z = (k - 1) * PARTS_SPAN;
+            model = glm::translate(model, glm::vec3(x, y, z));
+          } else {
+            // Translations
+            float xPos = (i - 1) * PARTS_SPAN;
+            float yPos = (j - 1) * PARTS_SPAN;
+            float zPos = (k - 1) * PARTS_SPAN;
+            model = glm::translate(model, glm::vec3(xPos, yPos, zPos));
+
+            // Rotations
+            model = glm::rotate(model, glm::radians(part->getRx()), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(part->getRy()), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(part->getRz()), glm::vec3(0.0f, 0.0f, 1.0f));          
+          }
+
+          // Final model          
           ourShader.setMat4("model", model);
 
           glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
