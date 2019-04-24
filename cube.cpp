@@ -9,6 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <stdlib.h>
+#include <time.h>
 #include <iostream>
 #include <cmath>
 
@@ -22,7 +24,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera defaults
-Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+Camera camera(glm::vec3(7.0f, 7.0f, 7.0f));
 float lastX =  SCR_WIDTH / 2.0;
 float lastY =  SCR_HEIGHT / 2.0;
 bool firstMouse = true;
@@ -91,6 +93,9 @@ public:
 
 int main()
 {
+  /* initialize random seed: */
+  srand (time(NULL));
+
   // Init cube data model
   Cube *cube = new Cube();
 
@@ -229,16 +234,59 @@ int main()
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   // TEMP: Rotating the right side
-  struct Rotation {
-    int x = -1;
-    int y = 0;
-    int z = -1;
-    float dirX = 0.0f;
-    float dirY = -1.0f;
-    float dirZ = 0.0f;
-    float angle = 0.0f;
-    const float speed = 1.0f;
-  } rotation;
+  class Rotation {
+  private:
+    int x_ = -1;  // -1 not rotating, 0 or 2 = left or right side of the cube
+    int y_ = -1;
+    int z_ = -1;
+    float dirX_ = 0.0f; // 0.0f not rotating, 1.0f rotating alongside this axis
+    float dirY_ = 0.0f;
+    float dirZ_ = 0.0f;
+    float angle_ = 0.0f;  // angle in degrees
+    const float speed_ = 3.0f;
+  public:
+    Rotation() {
+      // Empty
+    }
+    int x () { return x_; }
+    int y () { return y_; }
+    int z () { return z_; }
+    void x (int value) { x_ = value; }
+    void y (int value) { y_ = value; }
+    void z (int value) { z_ = value; }
+    float dirX () { return dirX_; }
+    float dirY () { return dirY_; }
+    float dirZ () { return dirZ_; }
+    void dirX (float value) { dirX_ = value; }
+    void dirY (float value) { dirY_ = value; }
+    void dirZ (float value) { dirZ_ = value; }
+    float angle () { return angle_; }
+    void angle (float value) { angle_ = value; }
+    
+    void updateAngle () {
+      if (abs(angle_) < speed_) {
+        finishRotation();
+      } else if (angle_ > 0) {
+        angle_ -= speed_;
+      } else {
+        angle_ += speed_;
+      }
+    }
+
+    void finishRotation () {
+      x_ = y_ = z_ = -1;
+      dirX_ = dirY_ = dirZ_ = 0.0f;
+      angle_ = 0.0f;
+    }
+
+    bool isRotating () {
+      if ((x_ + y_ + z_) == -3) {
+        return false;
+      }
+      return true;
+    }
+  };
+  Rotation *rotation = new Rotation();
 
   // render loop
   // -----------
@@ -278,7 +326,29 @@ int main()
     ourShader.setVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
 
     // TEMP: Rotating the right side
-    rotation.angle += rotation.speed;
+    if (!rotation->isRotating()) {
+      float angle = 90.0f;
+      if (rand() % 2) {
+        angle = -90.0f;
+      }
+      int side = 0;
+      if (rand() % 2) {
+        side = 2;
+      }
+      int random02 = rand() % 3;
+      if (random02 == 0) {
+        rotation->x(side);
+        rotation->dirX(1.0f);
+      } else if (random02 == 1) {
+        rotation->y(side);
+        rotation->dirY(1.0f);
+      } else {
+        rotation->z(side);
+        rotation->dirZ(1.0f);
+      }
+      rotation->angle(angle);
+    }
+    rotation->updateAngle();
 
     for (int i = 0; i < CUBE_SIZE; i++) {
       for (int j = 0; j < CUBE_SIZE; j++) {
@@ -288,9 +358,9 @@ int main()
           Part *part = cube->getPart(i, j, k);
 
           // TEMP: Rotating the right side - translation to the side center
-          if (i == rotation.x || j == rotation.y || k == rotation.z) {
+          if (i == rotation->x() || j == rotation->y() || k == rotation->z()) {
             // model = glm::translate(model, glm::vec3(i * PARTS_SPAN, 0.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(rotation.angle), glm::vec3(rotation.dirX, rotation.dirY, rotation.dirZ));
+            model = glm::rotate(model, glm::radians(rotation->angle()), glm::vec3(rotation->dirX(), rotation->dirY(), rotation->dirZ()));
             float x = (i - 1) * PARTS_SPAN;
             float y = (j - 1) * PARTS_SPAN;
             float z = (k - 1) * PARTS_SPAN;
@@ -334,6 +404,7 @@ int main()
   glfwTerminate();
 
   // Data model cleanup
+  delete rotation;
   delete cube;
 
   return 0;
