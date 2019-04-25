@@ -14,7 +14,9 @@
 #include <iostream>
 #include <cmath>
 
+#include "cube.hpp"
 #include "part.hpp"
+#include "rotation.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -40,26 +42,6 @@ const int PARTS_IN_CUBE = CUBE_SIZE * CUBE_SIZE * CUBE_SIZE;
 const float PARTS_SPAN = 1.1f;
 const unsigned int VERTICES_PER_PART = 36;
 const unsigned int FLOATS_PER_VERTEX = 9;
-
-class Cube {
-private:
-  Part *parts[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
-public:
-  Cube () {
-    // Initiate the parts of the cube
-    for (int i = 0; i < CUBE_SIZE; i++) {
-      for (int j = 0; j < CUBE_SIZE; j++) {
-        for (int k = 0; k < CUBE_SIZE; k++) {
-          parts[i][j][k] = new Part(i, j, k, 0.0f, 0.0f, 0.0f);
-        }
-      }
-    }
-  }
-  
-  Part *getPart (int x, int y, int z) {
-    return parts[x][y][z];
-  }
-};
 
 int main()
 {
@@ -109,50 +91,6 @@ int main()
   // ------------------------------------
   Shader ourShader("shader.vs", "shader.fs"); // you can name your shader files however you like
 
-  // float vertices[] = {
-  //   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.5f, 0.8f,
-
-  //   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 1.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 1.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 1.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 0.0f, 0.5f, 0.8f,
-
-  //   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-
-  //    0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-
-  //   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-
-  //   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  //   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.5f, 0.8f,
-  // };
-
   unsigned int VBO[PARTS_IN_CUBE];
   unsigned int VAO[PARTS_IN_CUBE];
   glGenVertexArrays(PARTS_IN_CUBE, VAO);
@@ -195,58 +133,6 @@ int main()
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   // TEMP: Rotating the right side
-  class Rotation {
-  private:
-    int x_ = -1;  // -1 not rotating, 0 or 2 = left or right side of the cube
-    int y_ = -1;
-    int z_ = -1;
-    float dirX_ = 0.0f; // 0.0f not rotating, 1.0f rotating alongside this axis
-    float dirY_ = 0.0f;
-    float dirZ_ = 0.0f;
-    float angle_ = 0.0f;  // angle in degrees
-    const float speed_ = 3.0f;
-  public:
-    Rotation() {
-      // Empty
-    }
-    int x () { return x_; }
-    int y () { return y_; }
-    int z () { return z_; }
-    void x (int value) { x_ = value; }
-    void y (int value) { y_ = value; }
-    void z (int value) { z_ = value; }
-    float dirX () { return dirX_; }
-    float dirY () { return dirY_; }
-    float dirZ () { return dirZ_; }
-    void dirX (float value) { dirX_ = value; }
-    void dirY (float value) { dirY_ = value; }
-    void dirZ (float value) { dirZ_ = value; }
-    float angle () { return angle_; }
-    void angle (float value) { angle_ = value; }
-    
-    void updateAngle () {
-      if (abs(angle_) < speed_) {
-        finishRotation();
-      } else if (angle_ > 0) {
-        angle_ -= speed_;
-      } else {
-        angle_ += speed_;
-      }
-    }
-
-    void finishRotation () {
-      x_ = y_ = z_ = -1;
-      dirX_ = dirY_ = dirZ_ = 0.0f;
-      angle_ = 0.0f;
-    }
-
-    bool isRotating () {
-      if ((x_ + y_ + z_) == -3) {
-        return false;
-      }
-      return true;
-    }
-  };
   Rotation *rotation = new Rotation();
 
   // render loop
@@ -287,7 +173,7 @@ int main()
     ourShader.setVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
 
     // TEMP: Rotating the right side
-    if (!rotation->isRotating()) {
+    if (false && !rotation->isRotating()) {
       float angle = 90.0f;
       if (rand() % 2) {
         angle = -90.0f;
@@ -300,14 +186,20 @@ int main()
       if (random02 == 0) {
         rotation->x(side);
         rotation->dirX(1.0f);
+        rotation->angle(angle);
+        // Rotate the parts
+        
+        // Move parts to new position in the cube
+        
       } else if (random02 == 1) {
-        rotation->y(side);
-        rotation->dirY(1.0f);
+        // rotation->y(side);
+        // rotation->dirY(1.0f);
+        // rotation->angle(angle);
       } else {
-        rotation->z(side);
-        rotation->dirZ(1.0f);
+        // rotation->z(side);
+        // rotation->dirZ(1.0f);
+        // rotation->angle(angle);
       }
-      rotation->angle(angle);
     } else {
       rotation->updateAngle();
     }    
@@ -335,9 +227,9 @@ int main()
             model = glm::translate(model, glm::vec3(xPos, yPos, zPos));
 
             // Rotations
-            model = glm::rotate(model, glm::radians(part->getRx()), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(part->getRy()), glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(part->getRz()), glm::vec3(0.0f, 0.0f, 1.0f));          
+            model = glm::rotate(model, glm::radians(part->rx()), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(part->ry()), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(part->rz()), glm::vec3(0.0f, 0.0f, 1.0f));
           }
 
           // Final model          

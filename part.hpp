@@ -49,44 +49,34 @@ class Part {
 private:
   static const unsigned int FLOATS_PER_VERTEX = 9;
   static const unsigned int COLOR_STARTS_AT_INDEX = 6;
-  int x, y, z;  // initial coordinates
-  float rx, ry, rz = 0.0f; // actual rotation
+  int x_, y_, z_;  // initial coordinates
+  float rx_, ry_, rz_ = 0.0f; // actual rotation
   float colors[3*6] = {
     0.0f, 0.5f, 0.8f, // Background
     1.0f, 0.5f, 0.8f,
     0.0f, 1.0f, 0.8f,
     0.0f, 0.5f, 1.0f,
     0.0f, 0.5f, 0.0f,
-    0.0f, 0.0f, 0.8f, 
+    0.8f, 0.8f, 1.0f, 
   };
 public:
   Part (int x, int y, int z, int rx, int ry, int rz):
-  x(x), y(y), z(z), rx(rx), ry(ry), rz(rz) {
+  x_(x), y_(y), z_(z), rx_(rx), ry_(ry), rz_(rz) {
     // Do nothing
   }
 
-  float getX () {
-    return x;
-  }
+  float x () { return x_; }
+  float y () { return y_; }
+  float z () { return z_; }
+  float rx () { return rx_; }
+  float ry () { return ry_; }
+  float rz () { return rz_; }
 
-  float getY () {
-    return y;
-  }
-
-  float getZ () {
-    return z;
-  }
-
-  float getRx () {
-    return rx;
-  }
-
-  float getRy () {
-    return ry;
-  }
-
-  float getRz () {
-    return rz;
+  void setRotation (float deltaRx, float deltaRy, float deltaRz) {
+    rx_ += deltaRx;
+    ry_ += deltaRy;
+    rz_ += deltaRz;
+    // TODO: Maintain rotation in (-180.0f, 180.0f>
   }
 
   void generatePartVertices(float vertices[36 * FLOATS_PER_VERTEX]) {
