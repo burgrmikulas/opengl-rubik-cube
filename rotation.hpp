@@ -14,7 +14,8 @@ class Rotation {
     float angle_ = 0.0f;  // angle in degrees (starting at -90.0f or 90.0f to choose direction)
     const float speed_ = 3.0f;
   public:
-    Rotation() {
+    Rotation(int x, int y, int z, float dirX, float dirY, float dirZ, float angle):
+    x_(x), y_(y), z_(z), dirX_(dirX), dirY_(dirY), dirZ_(dirZ), angle_(angle) {
       // Empty
     }
     int x () { return x_; }
@@ -32,14 +33,18 @@ class Rotation {
     float angle () { return angle_; }
     void angle (float value) { angle_ = value; }
     
-    void updateAngle () {
+    bool updateAngle () {
+      // TODO: Take FPS rate into consideration
+
       if (abs(angle_) < speed_) {
         finishRotation();
+        return false; // No longer rotating (finished)
       } else if (angle_ > 0) {
         angle_ -= speed_;
       } else {
         angle_ += speed_;
       }
+      return true;  // Still rotating
     }
 
     void finishRotation () {

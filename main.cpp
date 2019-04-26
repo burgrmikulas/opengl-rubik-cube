@@ -43,13 +43,13 @@ const float PARTS_SPAN = 1.1f;
 const unsigned int VERTICES_PER_PART = 36;
 const unsigned int FLOATS_PER_VERTEX = 9;
 
+// Init cube data model
+Cube *cube = new Cube();
+
 int main()
 {
   /* initialize random seed: */
   srand (time(NULL));
-
-  // Init cube data model
-  Cube *cube = new Cube();
 
   // glfw: initialize and configure
   // ------------------------------
@@ -100,7 +100,7 @@ int main()
     for (int j = 0; j < CUBE_SIZE; j++) {
       for (int k = 0; k < CUBE_SIZE; k++) {
         // generate vertices array
-        Part *part = cube->getPart(i, j, k);
+        Part *part = cube->part(i, j, k);
         float vertices[VERTICES_PER_PART * FLOATS_PER_VERTEX];
         part->generatePartVertices(vertices);
 
@@ -131,9 +131,6 @@ int main()
 
   // uncomment this call to draw in wireframe polygons.
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-  // TEMP: Rotating the right side
-  Rotation *rotation = new Rotation();
 
   // render loop
   // -----------
@@ -173,64 +170,57 @@ int main()
     ourShader.setVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
 
     // TEMP: Rotating the right side
-    if (false && !rotation->isRotating()) {
-      float angle = 90.0f;
-      if (rand() % 2) {
-        angle = -90.0f;
-      }
-      int side = 0;
-      if (rand() % 2) {
-        side = 2;
-      }
-      int random02 = rand() % 3;
-      if (random02 == 0) {
-        rotation->x(side);
-        rotation->dirX(1.0f);
-        rotation->angle(angle);
-        // Rotate the parts
-        
-        // Move parts to new position in the cube
-        
-      } else if (random02 == 1) {
-        // rotation->y(side);
-        // rotation->dirY(1.0f);
-        // rotation->angle(angle);
-      } else {
-        // rotation->z(side);
-        // rotation->dirZ(1.0f);
-        // rotation->angle(angle);
-      }
-    } else {
-      rotation->updateAngle();
-    }    
+    // if (false && !cube->isRotating()) {
+    //   float angle = 90.0f;
+    //   if (rand() % 2) {
+    //     angle = -90.0f;
+    //   }
+    //   int side = 0;
+    //   if (rand() % 2) {
+    //     side = 2;
+    //   }
+    //   int random02 = rand() % 3;
+    //   if (random02 == 0) {
+    //     cube->startRotation(side, -1, -1, 1.0f, 0.0f, 0.0f, angle);
+    //   } else if (random02 == 1) {
+    //     // rotation->y(side);
+    //     // rotation->dirY(1.0f);
+    //     // rotation->angle(angle);
+    //   } else {
+    //     // rotation->z(side);
+    //     // rotation->dirZ(1.0f);
+    //     // rotation->angle(angle);
+    //   }
+    // }
+
+    if (cube->isRotating()) {
+      cube->proceedRotation();
+    }
 
     for (int i = 0; i < CUBE_SIZE; i++) {
       for (int j = 0; j < CUBE_SIZE; j++) {
         for (int k = 0; k < CUBE_SIZE; k++) {
           // Init empty model and part pointer
           glm::mat4 model = glm::mat4(1.0f);
-          Part *part = cube->getPart(i, j, k);
+          Part *part = cube->part(i, j, k);
 
           // TEMP: Rotating the right side - translation to the side center
-          if (i == rotation->x() || j == rotation->y() || k == rotation->z()) {
-            // model = glm::translate(model, glm::vec3(i * PARTS_SPAN, 0.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(rotation->angle()), glm::vec3(rotation->dirX(), rotation->dirY(), rotation->dirZ()));
-            float x = (i - 1) * PARTS_SPAN;
-            float y = (j - 1) * PARTS_SPAN;
-            float z = (k - 1) * PARTS_SPAN;
-            model = glm::translate(model, glm::vec3(x, y, z));
-          } else {
-            // Translations
-            float xPos = (i - 1) * PARTS_SPAN;
-            float yPos = (j - 1) * PARTS_SPAN;
-            float zPos = (k - 1) * PARTS_SPAN;
-            model = glm::translate(model, glm::vec3(xPos, yPos, zPos));
-
-            // Rotations
-            model = glm::rotate(model, glm::radians(part->rx()), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(part->ry()), glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(part->rz()), glm::vec3(0.0f, 0.0f, 1.0f));
+          if (cube->isRotating()) {
+            if (i == cube->rotation()->x() || j == cube->rotation()->y() || k == cube->rotation()->z()) {
+              model = glm::rotate(model, glm::radians(cube->rotation()->angle()), glm::vec3(cube->rotation()->dirX(), cube->rotation()->dirY(), cube->rotation()->dirZ()));
+            }
           }
+
+          // Translations
+          float x = (i - 1) * PARTS_SPAN;
+          float y = (j - 1) * PARTS_SPAN;
+          float z = (k - 1) * PARTS_SPAN;
+          model = glm::translate(model, glm::vec3(x, y, z));
+
+          // Rotations
+          model = glm::rotate(model, glm::radians(part->rx()), glm::vec3(1.0f, 0.0f, 0.0f));
+          model = glm::rotate(model, glm::radians(part->ry()), glm::vec3(0.0f, 1.0f, 0.0f));
+          model = glm::rotate(model, glm::radians(part->rz()), glm::vec3(0.0f, 0.0f, 1.0f));
 
           // Final model          
           ourShader.setMat4("model", model);
@@ -258,7 +248,6 @@ int main()
   glfwTerminate();
 
   // Data model cleanup
-  delete rotation;
   delete cube;
 
   return 0;
@@ -280,6 +269,8 @@ void processInput(GLFWwindow *window)
     camera.ProcessKeyboard(LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     camera.ProcessKeyboard(RIGHT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+    cube->startRotation(2, -1, -1, 1.0f, 0.0f, 0.0f, 90.0f);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

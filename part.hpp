@@ -52,12 +52,13 @@ private:
   int x_, y_, z_;  // initial coordinates
   float rx_, ry_, rz_ = 0.0f; // actual rotation
   float colors[3*6] = {
-    0.0f, 0.5f, 0.8f, // Background
-    1.0f, 0.5f, 0.8f,
-    0.0f, 1.0f, 0.8f,
-    0.0f, 0.5f, 1.0f,
-    0.0f, 0.5f, 0.0f,
-    0.8f, 0.8f, 1.0f, 
+    // 0.0f, 0.5f, 0.8f, // Background
+    0.4f, 0.0f, 0.0f,
+    0.0f, 0.4f, 0.0f,
+    0.0f, 0.0f, 0.4f,
+    0.4f, 0.0f, 0.4f,
+    0.0f, 0.4f, 0.4f,
+    0.4f, 0.4f, 0.4f,
   };
 public:
   Part (int x, int y, int z, int rx, int ry, int rz):
