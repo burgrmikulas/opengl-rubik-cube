@@ -17,7 +17,7 @@ public:
     for (int i = 0; i < CUBE_SIZE; i++) {
       for (int j = 0; j < CUBE_SIZE; j++) {
         for (int k = 0; k < CUBE_SIZE; k++) {
-          parts_[i][j][k] = new Part(i, j, k, 0.0f, 0.0f, 0.0f);
+          parts_[i][j][k] = new Part(i, j, k);
 
           // TEST
           if (i == 2 && j == 0 && k == 0) {
@@ -53,38 +53,6 @@ public:
     }
   }
 
-  void printPart (Part *part, std::string label = "PART") {
-    std::cout << label << std::endl;
-    std::cout << "PART ORIGIN: " << part->x() << " "
-      << part->y() << " " << part->z() << std::endl;
-    // Find its actual position in the cube
-    for (int i = 0; i < CUBE_SIZE; i++) {
-      for (int j = 0; j < CUBE_SIZE; j++) {
-        for (int k = 0; k < CUBE_SIZE; k++) {
-          if (parts_[i][j][k] == part) {
-            std::cout << "Now at: " << i << " " << j << " " << k << std::endl;
-          }
-        }
-      }
-    }
-    std::cout << "Rotations: " << part->rx() << " "
-      << part->ry() << " " << part->rz() << std::endl;
-    std::cout << std::endl;
-  }
-
-  void printRotations (std::string label = "CUBE PRINT ROTATIONS") {
-    std::cout << label << std::endl;
-    for (int i = 0; i < CUBE_SIZE; i++) {
-      for (int j = 0; j < CUBE_SIZE; j++) {
-        for (int k = 0; k < CUBE_SIZE; k++) {
-          std::cout << parts_[i][j][k]->rx() << " " << parts_[i][j][k]->ry() << " " << parts_[i][j][k]->rz() << " | ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-    }
-  }
-
   void printDiff (std::string label = "CUBE PRINT DIFF") {
     std::cout << label << std::endl;
     for (int i = 0; i < CUBE_SIZE; i++) {
@@ -110,12 +78,6 @@ public:
       int isRotatingX = x == -1 ? 0 : 1;
       int isRotatingY = y == -1 ? 0 : 1;
       int isRotatingZ = z == -1 ? 0 : 1;
-
-      // Print before rotation
-      // print();
-      printPart(test, "BEFORE");
-      // printRotations();
-
 
       // Move parts to new position in the cube
       for (int i = 0; i < CUBE_SIZE; i++) {
@@ -179,10 +141,6 @@ public:
       // Angle must be negative (as the parts have been moved before the animation starts)
       rotation_ = new Rotation(x, y, z, -angle);
 
-
-      // print("AFTER ROTATION");
-      printPart(test, "AFTER");
-      // printRotations("AFTER");
     }
   }
 

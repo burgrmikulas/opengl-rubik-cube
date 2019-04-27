@@ -218,9 +218,7 @@ int main()
           model = glm::translate(model, glm::vec3(x, y, z));
           
           // Rotations
-          model = glm::rotate(model, glm::radians(part->rx()), glm::vec3(1.0f, 0.0f, 0.0f));
-          model = glm::rotate(model, glm::radians(part->ry()), glm::vec3(0.0f, 1.0f, 0.0f));
-          model = glm::rotate(model, glm::radians(part->rz()), glm::vec3(0.0f, 0.0f, 1.0f));
+          model = model * part->rotation();
 
           // Final model          
           ourShader.setMat4("model", model);

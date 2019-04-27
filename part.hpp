@@ -50,7 +50,7 @@ private:
   static const unsigned int FLOATS_PER_VERTEX = 9;
   static const unsigned int COLOR_STARTS_AT_INDEX = 6;
   int x_, y_, z_;  // initial coordinates
-  float rx_, ry_, rz_ = 0.0f; // actual rotation
+  glm::mat4 rotation_ = glm::mat4(1.0f); // actual rotation
   float colors[3*6] = {
     // 0.0f, 0.5f, 0.8f, // Background
     0.8f, 0.0f, 0.0f,
@@ -61,23 +61,24 @@ private:
     0.0f, 0.8f, 0.8f,
   };
 public:
-  Part (int x, int y, int z, int rx, int ry, int rz):
-  x_(x), y_(y), z_(z), rx_(rx), ry_(ry), rz_(rz) {
+  Part (int x, int y, int z):
+  x_(x), y_(y), z_(z) {
     // Do nothing
   }
 
   int x () { return x_; }
   int y () { return y_; }
   int z () { return z_; }
-  float rx () { return rx_; }
-  float ry () { return ry_; }
-  float rz () { return rz_; }
+  glm::mat4 rotation () { return rotation_; }
 
   void setRotation (float deltaRx, float deltaRy, float deltaRz) {
-    rx_ += deltaRx;
-    ry_ += deltaRy;
-    rz_ += deltaRz;
-    // TODO: Maintain rotation in (-180.0f, 180.0f>
+    if (deltaRx) {
+      rotation_ = glm::rotate(glm::mat4(1.0f), glm::radians(deltaRx), glm::vec3(1.0f, 0.0f, 0.0f)) * rotation_;
+    } else if (deltaRy) {
+      rotation_ = glm::rotate(glm::mat4(1.0f), glm::radians(deltaRy), glm::vec3(0.0f, 1.0f, 0.0f)) * rotation_;
+    } else if (deltaRz) {
+      rotation_ = glm::rotate(glm::mat4(1.0f), glm::radians(deltaRz), glm::vec3(0.0f, 0.0f, 1.0f)) * rotation_;
+    }
   }
 
   bool isOuterSide (int sideIndex) {
