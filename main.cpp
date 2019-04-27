@@ -204,7 +204,7 @@ int main()
           glm::mat4 model = glm::mat4(1.0f);
           Part *part = cube->part(i, j, k);
 
-          // TEMP: Rotating the right side - translation to the side center
+          // Animated rotation
           if (cube->isRotating()) {
             if (i == cube->rotation()->x() || j == cube->rotation()->y() || k == cube->rotation()->z()) {
               model = glm::rotate(model, glm::radians(cube->rotation()->angle()), glm::vec3(cube->rotation()->dirX(), cube->rotation()->dirY(), cube->rotation()->dirZ()));
@@ -216,7 +216,7 @@ int main()
           float y = (j - 1) * PARTS_SPAN;
           float z = (k - 1) * PARTS_SPAN;
           model = glm::translate(model, glm::vec3(x, y, z));
-
+          
           // Rotations
           model = glm::rotate(model, glm::radians(part->rx()), glm::vec3(1.0f, 0.0f, 0.0f));
           model = glm::rotate(model, glm::radians(part->ry()), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -225,7 +225,9 @@ int main()
           // Final model          
           ourShader.setMat4("model", model);
 
-          glBindVertexArray(VAO[i * CUBE_SIZE * CUBE_SIZE + j * CUBE_SIZE + k]); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+          // Take the correct VAO (VAO of the part which is currently sitting at this XYZ position in the cube)
+          // (locating it by the part original coordinates)
+          glBindVertexArray(VAO[part->x() * CUBE_SIZE * CUBE_SIZE + part->y() * CUBE_SIZE + part->z()]); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
           glDrawArrays(GL_TRIANGLES, 0, 36);
           // glBindVertexArray(0); // no need to unbind it every time 
         }
@@ -269,8 +271,23 @@ void processInput(GLFWwindow *window)
     camera.ProcessKeyboard(LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     camera.ProcessKeyboard(RIGHT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+    cube->startRotation(2, -1, -1, 90.0f);
+  if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+    cube->startRotation(0, -1, -1, 90.0f);
   if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-    cube->startRotation(2, -1, -1, 1.0f, 0.0f, 0.0f, 90.0f);
+    cube->startRotation(2, -1, -1, -90.0f);
+  if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+    cube->startRotation(0, -1, -1, -90.0f);
+  if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+    cube->startRotation(-1, 2, -1, 90.0f);
+  if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+    cube->startRotation(-1, 0, -1, 90.0f);
+  if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+    cube->startRotation(-1, 2, -1, -90.0f);
+  if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+    cube->startRotation(-1, 0, -1, -90.0f);
+    
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
