@@ -99,15 +99,10 @@ public:
         // Apply different colot on outer sides
         if (j >= COLOR_STARTS_AT_INDEX && j <= COLOR_STARTS_AT_INDEX + 3) {
           int sideIndex = i/6;  // 0-5 (left, right, bottom, top, rear, front)
-          // TEST
-          float intensity = 0.4f;
-          if (x_ == 2 && y_ == 0 && z_ == 0) {
-            intensity = 1.0f;
-          }
 
           if (isOuterSide(sideIndex)) {
             int colorIndex = sideIndex * 3 + (j - COLOR_STARTS_AT_INDEX);
-            vertices[i * FLOATS_PER_VERTEX + j] = colors[colorIndex] * intensity;
+            vertices[i * FLOATS_PER_VERTEX + j] = colors[colorIndex];
           }
         }
       }

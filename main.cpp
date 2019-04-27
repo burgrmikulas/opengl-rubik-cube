@@ -153,45 +153,18 @@ int main()
     ourShader.use();
 
     // create transformations
-    // float radius = 10.0f;
-    // float camX = sin(glfwGetTime()) * radius;
-    // float camZ = cos(glfwGetTime()) * radius;
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 projection    = glm::mat4(1.0f);
-    // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
     projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    
     // retrieve the matrix uniform locations
     unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
     unsigned int viewLoc  = glGetUniformLocation(ourShader.ID, "view");
-    // pass them to the shaders
     
+    // pass them to the shaders    
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
     ourShader.setVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
-
-    // TEMP: Rotating the right side
-    // if (false && !cube->isRotating()) {
-    //   float angle = 90.0f;
-    //   if (rand() % 2) {
-    //     angle = -90.0f;
-    //   }
-    //   int side = 0;
-    //   if (rand() % 2) {
-    //     side = 2;
-    //   }
-    //   int random02 = rand() % 3;
-    //   if (random02 == 0) {
-    //     cube->startRotation(side, -1, -1, 1.0f, 0.0f, 0.0f, angle);
-    //   } else if (random02 == 1) {
-    //     // rotation->y(side);
-    //     // rotation->dirY(1.0f);
-    //     // rotation->angle(angle);
-    //   } else {
-    //     // rotation->z(side);
-    //     // rotation->dirZ(1.0f);
-    //     // rotation->angle(angle);
-    //   }
-    // }
 
     if (cube->isRotating()) {
       cube->proceedRotation();
@@ -269,6 +242,7 @@ void processInput(GLFWwindow *window)
     camera.ProcessKeyboard(LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     camera.ProcessKeyboard(RIGHT, deltaTime);
+
   if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
     cube->startRotation(2, -1, -1, 90.0f);
   if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
@@ -277,6 +251,7 @@ void processInput(GLFWwindow *window)
     cube->startRotation(2, -1, -1, -90.0f);
   if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
     cube->startRotation(0, -1, -1, -90.0f);
+
   if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
     cube->startRotation(-1, 2, -1, 90.0f);
   if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
@@ -285,6 +260,15 @@ void processInput(GLFWwindow *window)
     cube->startRotation(-1, 2, -1, -90.0f);
   if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
     cube->startRotation(-1, 0, -1, -90.0f);
+
+  if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+    cube->startRotation(-1, -1, 2, 90.0f);
+  if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    cube->startRotation(-1, -1, 0, 90.0f);
+  if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+    cube->startRotation(-1, -1, 2, -90.0f);
+  if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+    cube->startRotation(-1, -1, 0, -90.0f);
     
 }
 

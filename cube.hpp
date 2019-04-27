@@ -8,8 +8,7 @@ class Cube {
 private:
   static const unsigned int CUBE_SIZE = 3;
   Part *parts_[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
-  Part *tempParts_[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];  // Temporary . used during replacing parts (rotation)
-  Part *test;
+  Part *tempParts_[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];  // Used as buffer during replacing parts (rotation)
   Rotation *rotation_ = nullptr;
 public:
   Cube () {
@@ -18,11 +17,6 @@ public:
       for (int j = 0; j < CUBE_SIZE; j++) {
         for (int k = 0; k < CUBE_SIZE; k++) {
           parts_[i][j][k] = new Part(i, j, k);
-
-          // TEST
-          if (i == 2 && j == 0 && k == 0) {
-            test = parts_[i][j][k]; // [2, 0, 0]
-          }
         }
       }
     }
@@ -38,39 +32,6 @@ public:
 
   bool isRotating () {
     return rotation_ != nullptr;
-  }
-
-  void print (std::string label = "CUBE PRINT") {
-    std::cout << label << std::endl;
-    for (int i = 0; i < CUBE_SIZE; i++) {
-      for (int j = 0; j < CUBE_SIZE; j++) {
-        for (int k = 0; k < CUBE_SIZE; k++) {
-          std::cout << parts_[i][j][k]->x() << " " << parts_[i][j][k]->y() << " " << parts_[i][j][k]->z() << " | ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-    }
-  }
-
-  void printDiff (std::string label = "CUBE PRINT DIFF") {
-    std::cout << label << std::endl;
-    for (int i = 0; i < CUBE_SIZE; i++) {
-      for (int j = 0; j < CUBE_SIZE; j++) {
-        for (int k = 0; k < CUBE_SIZE; k++) {
-          if (!(parts_[i][j][k]->x() == tempParts_[i][j][k]->x() && parts_[i][j][k]->y() == tempParts_[i][j][k]->y() && parts_[i][j][k]->z() == tempParts_[i][j][k]->z())) {
-            std::cout << "*";
-          } else {
-            std::cout << " ";
-          }
-          std::cout << parts_[i][j][k]->x() << " " << parts_[i][j][k]->y() << " " << parts_[i][j][k]->z();
-          std::cout << " -> ";  
-          std::cout << tempParts_[i][j][k]->x() << " " << tempParts_[i][j][k]->y() << " " << tempParts_[i][j][k]->z() << " | ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-    }
   }
 
   void startRotation (int x, int y, int z, float angle) {
@@ -106,7 +67,7 @@ public:
               if (y != -1) {
                 // Rotating by the Y axis
                 newJ = j;
-                if (angle < 0.0f) {
+                if (angle < 0.0f) { // Reversed < due to the fact that X, Z axises follow in reverse order (compared to other rotations)
                   // Clockwise
                   newI = CUBE_SIZE - 1 - k;
                   newK = i;
@@ -117,6 +78,15 @@ public:
               }
               if (z != -1) {
                 // Rotating by the Z axis
+                newK = k;
+                if (angle > 0.0f) {
+                  // Clockwise
+                  newI = CUBE_SIZE - 1 - j;
+                  newJ = i;
+                } else {
+                  newI = j;
+                  newJ = CUBE_SIZE - 1 - i;
+                }
               }
               
               tempParts_[newI][newJ][newK] = parts_[i][j][k];
