@@ -5,12 +5,11 @@ build.sh
 
 # Controls
 
-X: Auto-shuffle the cube
-Z: Stop auto-shuffling the cube
+* X: Auto-shuffle the cube
+* Z: Stop auto-shuffling the cube
 
 ## Manual controls
 
-R T     I O
-F G     K L
-    H J
-    N M
+* Rotate along the X axis: I, K, O, L
+* Rotate along the Y axis: H, J, N, M
+* Rotate along the Z axis: R, T, F, G
