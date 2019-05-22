@@ -45,6 +45,8 @@ const unsigned int FLOATS_PER_VERTEX = 9;
 
 // Init cube data model
 Cube *cube = new Cube();
+bool shuffling = false;
+bool solving = false;
 
 int main()
 {
@@ -168,6 +170,39 @@ int main()
 
     if (cube->isRotating()) {
       cube->proceedRotation();
+    } else if (shuffling) {
+      // Rotating randomly
+      int axis = rand() % 3;  // 0 - 2
+      int side = (rand() % 2) * 2; // 0 or 2
+      float direction = rand() % 2 ? -90.0f : 90.0f; // -90.0f or 90.0f
+      
+      if (axis == 0) {
+        cube->startRotation(side, -1, -1, direction);
+      } else if (axis == 1) {
+        cube->startRotation(-1, side, -1, direction);
+      } else if (axis == 2) {
+        cube->startRotation(-1, -1, side, direction);
+      }
+    } else if (solving) {
+      // TEST: Top cross
+
+      // Find location of the [1, 2, 2]
+      int x, y, z;
+      for (int i = 0; i < CUBE_SIZE; i++) {
+        for (int j = 0; j < CUBE_SIZE; j++) {
+          for (int k = 0; k < CUBE_SIZE; k++) {
+            if (cube->part(i, j, k)->isOriginedAt(1, 2, 2)) {
+              x = i;
+              y = j;
+              z = k;
+            }
+          }
+        }
+      }
+      // If positioned in middle layer
+      if (y == 1) {
+        
+      }
     }
 
     for (int i = 0; i < CUBE_SIZE; i++) {
@@ -242,6 +277,19 @@ void processInput(GLFWwindow *window)
     camera.ProcessKeyboard(LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     camera.ProcessKeyboard(RIGHT, deltaTime);
+
+  if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+    shuffling = false;
+    solving = false;
+  }
+  if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+    shuffling = true;
+    solving = false;
+  }
+  if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+    shuffling = false;
+    solving = true;
+  }
 
   if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
     cube->startRotation(2, -1, -1, 90.0f);

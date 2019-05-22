@@ -9,7 +9,7 @@ class Rotation {
     int y_ = -1;
     int z_ = -1;
     float angle_ = 0.0f;  // angle in degrees (starting at -90.0f or 90.0f to choose direction)
-    const float speed_ = 3.0f;
+    const float speed_ = 4.0f;
   public:
     Rotation(int x, int y, int z, float angle):
     x_(x), y_(y), z_(z), angle_(angle) {

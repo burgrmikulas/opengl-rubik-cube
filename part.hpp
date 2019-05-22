@@ -90,6 +90,11 @@ public:
     return false;
   }
 
+  // Returs true if this part has been originally positioned at the provided coordinates
+  bool isOriginedAt (int x, int y, int z) {
+    return x == x_ && y == y_ && z == z_;
+  }
+
   void generatePartVertices(float vertices[36 * FLOATS_PER_VERTEX]) {
     for (int i = 0; i < 36; i++) {
       for (int j =0; j < FLOATS_PER_VERTEX; j++) {
