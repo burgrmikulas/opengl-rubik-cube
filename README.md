@@ -5,8 +5,8 @@ build.sh
 
 # Controls
 
-* X: Auto-shuffle the cube
-* Z: Stop auto-shuffling the cube
+* Auto-shuffle the cube: X
+* Stop auto-shuffling the cube: Z
 
 ## Manual controls
 
